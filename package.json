@@ -1,0 +1,21 @@
+{
+  "name": "components",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sync": "browser-sync start --server --files \"**\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Godzhang/components.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Godzhang/components/issues"
+  },
+  "homepage": "https://github.com/Godzhang/components#readme"
+}
