@@ -1,6 +1,6 @@
 (function(){
+	var camelRegExp = /-([a-z])/gi;
 	var obj = Object.prototype;
-
 	var toString = obj.toString;
 
 	var pub = {
@@ -42,8 +42,31 @@
 				event.cancelBubble = true;
 			}	
 		},
+		//获取计算后的样式
+		getComputedStyle: function(elem, pseudo){
+			if(window.getComputedStyle){
+				return window.getComputedStyle(elem, pseudo);
+			}else{
+				return elem.currentStyle;
+			}
+		},
+		//获取具体样式，不支持驼峰写法
+		getPropertyValue: function(elem, style, pseudo){
+			if(window.getComputedStyle){
+				return window.getComputedStyle(elem, pseudo).getPropertyValue(style);
+			}else{
+				style = pub.camelCase(style);
+				//IE9+支持currentStyle.getPropertyValue方法
+				return elem.currentStyle.getAttribute(style);
+			}			
+		},
+		camelCase: function(str){
+			return str.replace(/^-ms-/,"ms-").replace(camelRegExp, function(all, letter){
+				return letter.toUpperCase();
+			});
+		},
 		keys: function(obj){
-			if(toString.call(obj) != '[object Object]') return [];
+			if(toString.call(obj) !== '[object Object]') return [];
 
 			if(Object.keys){
 				return Object.keys(obj);

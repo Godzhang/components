@@ -8,7 +8,7 @@
 		var dragging = null,
 			diffX = 0,
 			diffY = 0;
-			
+		
 		function handleEvent(ev){
 			//获取事件和目标
 			ev = ev || window.event;
