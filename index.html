@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="language" content="zh_cn" />
+<title>demo</title>
+<link href="src/css/reset.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+
+#div{position: absolute;width: 100px;height: 100px;background: #08c;}
+
+</style>
+<script src="src/js/public.js"></script>
+</head>
+<body>
+
+
+<div id="div">
+	<span>123</span>
+</div>
+<script>
+	var div = document.getElementById("div");
+	
+	pub.addEvent(div,"myEvent", function(event){
+		console.log(event.detail);
+	})
+	var ev = document.createEvent("CustomEvent");
+
+	ev.initCustomEvent('myEvent', true, false, "zhaojinge");
+
+	div.dispatchEvent('myEvent');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

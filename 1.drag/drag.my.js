@@ -36,9 +36,7 @@
 				if(target.nodeName.toLowerCase() !== 'img'){
 					pub.stopPropagetion(event);
 				}
-				if(target.nodeName.toLowerCase() === 'img'){
-					pub.preventDefault(event);
-				}
+				pub.preventDefault(event);
 			});
 			//初始化判断
 			if(parent == 'parent'){

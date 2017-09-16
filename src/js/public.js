@@ -42,6 +42,58 @@
 				event.cancelBubble = true;
 			}	
 		},
+		getRelatedTarget: function(event){
+			if(event.relatedTarget){
+				return event.relatedTarget;
+			}else if(event.toElement){
+				return event.toElement;
+			}else if(event.fromElement){
+				return event.fromElement;
+			}else{
+				return null;
+			}
+		},
+		hasFeature: function(name, version){
+			return document.implementation.hasFeature(name, version);
+		},
+		getButton: function(event){
+			if(pub.hasFeature("MouseEvents", "2.0")){
+				return event.button;
+			}else{
+				switch(event.button){
+					case 0:
+					case 1:
+					case 3:
+					case 5:
+					case 7:
+						return 0;
+					case 2:
+					case 6:
+						return 2;
+					case 4:
+						return 1;
+				}
+			}
+		},
+		getWheelDelta: function(event){
+			if(event.wheelDelta){
+				return event.wheelDelta;
+			}else{
+				return -event.detail * 40;
+			}
+		},
+		getCharCode: function(event){
+			//触发keypress事件才有值
+			if(typeof event.charCode === "number"){
+				return event.charCode;
+			}else{
+				return event.keyCode;
+			}
+		},
+		getCodeString: function(event){
+			var keyCode = pub.getCharCode(event);
+			return String.fromCharCode(keyCode);
+		},
 		//获取计算后的样式
 		getComputedStyle: function(elem, pseudo){
 			if(window.getComputedStyle){
@@ -59,6 +111,13 @@
 				//IE9+支持currentStyle.getPropertyValue方法
 				return elem.currentStyle.getAttribute(style);
 			}			
+		},
+		//阻止右键上下文菜单
+		preventContextmenu: function(event){
+			pub.addEvent(document, "contextmenu", function(event){
+				event = pub.getEvent(event);
+				pub.preventDefault(event);
+			});
 		},
 		camelCase: function(str){
 			return str.replace(/^-ms-/,"ms-").replace(camelRegExp, function(all, letter){
