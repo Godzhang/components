@@ -35,9 +35,9 @@
 				event.returnValue = false;
 			}
 		},
-		stopPropagetion: function(event){
-			if(event.stopPropagetion){
-				event.stopPropagetion();
+		stopPropagation: function(event){
+			if(event.stopPropagation){
+				event.stopPropagation();
 			}else{
 				event.cancelBubble = true;
 			}	
@@ -119,6 +119,154 @@
 				pub.preventDefault(event);
 			});
 		},
+		//返回表单选中文字
+		getSelectedText: function(textbox){
+			if(typeof textbox.selectionStart === "number"){
+				return textbox.value.substring(textbox.selectionStart, textbox.selectionEnd);
+			}else if(document.selection){
+				return document.selection.createRange().text;
+			}
+		},
+		//选择文本指定范围
+		selectText: function(textbox, startIndex, endIndex){
+			if(textbox.setSelectionRange){
+				textbox.focus();
+				textbox.setSelectionRange(startIndex, endIndex);
+			}else if(textbox.createTextRange){
+				var range = textbox.createTextRange();
+				range.collapse(true);
+				range.moveStart("character", startIndex);
+				range.moveEnd("character", endIndex);
+				range.select();
+			}
+		},
+		//获取剪切板内容
+		getClipboardText: function(event){
+			var clipboardData = (event.clipboardData || window.clipboardData);
+			return clipboardData.getData("text");
+		},
+		setClipboardText: function(event){
+			if(event.clipboardData){
+				return event.clipboardData.setData("text/plain", value);
+			}else if(window.clipboardData){
+				return window.clipboardData.setData("text", value);
+			}
+		},
+		//添加规则
+		insertRule: function(sheet, selectorText, cssText, pos){
+			if(sheet.insertRule){
+				sheet.insertRule(selectorText + "{" + cssText + "}", pos);
+			}else if(sheet.addRule){
+				sheet.addRule(selectorText, cssText, pos);
+			}
+		},
+		//删除规则
+		deleteRule: function(sheet, index){
+			if(sheet.deleteRule){
+				sheet.deleteRule(index);
+			}else if(sheet.removeRule){
+				sheet.removeRule(index);
+			}
+		},
+		//获取元素偏移量
+		getElementLeft: function(elem){
+			var actualLeft = elem.offsetLeft;
+			var current = elem.offsetParent;
+
+			while(current !== null){
+				actualLeft += current.offsetLeft;
+				current = current.offsetParent;
+			}
+
+			return actualLeft;
+		},
+		getElementTop: function(elem){
+			var actualTop = elem.offsetTop;
+			var current = elem.offsetParent;
+
+			while(current !== null){
+				actualTop += current.offsetTop;
+				current = current.offsetParent;
+			}
+
+			return actualTop;
+		},
+		//获取视口(客户区)大小，不包括滚动条
+		getViewport: function(){
+			if(document.compatMode == "BackCompat"){
+				return {
+					width: document.body.clientWidth,
+					height: document.body.clientHeight
+				};
+			}else{
+				return {
+					width: document.documentElement.clientWidth,
+					height: document.documentElement.clientHeight
+				};
+			}
+		},
+		//确定元素相对于视口左上角(0,0)的位置
+		getBoundingClientRect: function(elem){
+			var scrollTop = document.documentElement.scrollTop;
+			var scrollLeft = document.documentElement.scrollLeft;
+
+			if(elem.getBoundingClientRect){
+				if(typeof arguments.callee.offset != "number"){
+					var scrollTop = document.documentElement.scrollTop;
+					var temp = document.createElement("div");
+					temp.style.cssText = "position: absolute;left: 0;top: 0;";
+					document.body.appendChild(temp);
+					arguments.callee.offset = -temp.getBoundingClientRect().top - scrollTop;
+					document.body.removeChild(temp);
+					temp = null;
+				}
+
+				var rect = elem.getBoundingClientRect();
+				var offset = arguments.callee.offset;
+
+				return {
+					left: rect.left + offset,
+					right: rect.right + offset,
+					top: rect.top + offset,
+					bottom: rect.bottom + offset
+				};
+			}else{
+				var actualLeft = pub.getElementLeft(elem);
+				var actualTop = pub.getElementTop(elem);
+
+				return {
+					left: actualLeft - scrollLeft,
+					right: actualLeft + elem.offsetWidth - scrollLeft,
+					top: actualTop - scrollTop,
+					bottom: actualTop + elem.offsetHeight - scrollTop
+				}
+			}
+		},
+		nodeFilter: ['NodeFilter.SHOW_ALL','NodeFilter.SHOW_ELEMENT','NodeFilter.SHOW_TEXT'],
+		//创建treewalker
+		createTreeWalker: function(root, nodeFilter, elem, ifskip){
+			var filter,skiporreject, treewalker;
+
+			if(root.nodeType !== 1 && root !== document) return null;
+			if(!elem){
+				filter = null;
+			}else{
+				filter = function(node){
+					if(ifskip){
+						skiporreject = NodeFilter.FILTER_SKIP;
+					}else{
+						skiporreject = NodeFilter.FILTER_REJECT;
+					}
+					return node.tagName.toLowerCase() == elem ? NodeFilter.FILTER_ACCEPT : skiporreject;
+				}
+			}
+
+			treewalker = document.createTreeWalker(root, nodeFilter, filter, false);
+
+			return treewalker;
+		},
+
+
 		camelCase: function(str){
 			return str.replace(/^-ms-/,"ms-").replace(camelRegExp, function(all, letter){
 				return letter.toUpperCase();
